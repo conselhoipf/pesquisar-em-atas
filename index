@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pesquisar Atas</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 800px; 
+      margin: auto; 
+      padding: 10px; 
+    }
+    h1 { 
+      text-align: center; 
+      font-size: 2.5rem; /* ajustado */
+    }
+    form { 
+      display: flex; 
+      gap: 10px; 
+      justify-content: center; 
+      flex-wrap: wrap; 
+      margin-bottom: 20px; 
+    }
+    input[type="text"] { 
+      flex: 1; 
+      min-width: 200px; 
+      padding: 8px; /* conforto extra */
+      font-size: 1.2rem; /* texto digitado maior */
+    }
+    button { 
+      padding: 20px 30px; /* dobrado */
+      font-size: 1.2rem;  /* maior texto */
+      cursor: pointer; 
+    }
+    .result { 
+      border-bottom: 1px solid #ccc; 
+      padding: 10px 0; 
+    }
+    .result a { 
+      font-weight: bold; 
+      text-decoration: none; 
+      color: #0066cc; 
+    }
+    .result a:hover {
+      text-decoration: underline;
+    }
+    .snippet { 
+      color: #555; 
+      font-style: italic; 
+      margin-top: 5px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Buscar em Atas</h1>
+  <form onsubmit="buscar(); return false;">
+    <input type="text" id="keyword" placeholder="Digite a palavra-chave..." required>
+    <button type="submit">Buscar</button>
+  </form>
+  <div id="resultados"></div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwWSYdiaETX9nt1B32P1AYnXgd_EBtSQZbpzVcRCy6zQWNyyhZrzZo-sitLUAR6mtMxbg/exec"; // <-- troque pela URL do seu Apps Script
+
+    async function buscar() {
+      const palavra = document.getElementById("keyword").value;
+      document.getElementById("resultados").innerHTML = "<p>Buscando...</p>";
+
+      try {
+        const resp = await fetch(API_URL + "?busca=" + encodeURIComponent(palavra));
+        const data = await resp.json();
+
+        if (data.length === 0) {
+          document.getElementById("resultados").innerHTML = "<p>Nenhum documento encontrado.</p>";
+        } else {
+          let html = "<h2>Resultados:</h2>";
+          data.forEach(doc => {
+            html += `<div class="result">
+                      <a href="${doc.link}" target="_blank">${doc.nome}</a>
+                      <div class="snippet">${doc.trecho}</div>
+                     </div>`;
+          });
+          document.getElementById("resultados").innerHTML = html;
+        }
+      } catch (e) {
+        document.getElementById("resultados").innerHTML = "<p>Erro ao buscar resultados.</p>";
+        console.error(e);
+      }
+    }
+  </script>
+</body>
+</html>
