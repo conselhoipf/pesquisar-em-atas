@@ -3,92 +3,513 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pesquisar Atas</title>
+  <title>Sistema de Busca de Atas</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body { 
-      font-family: Arial, sans-serif; 
-      max-width: 800px; 
-      margin: auto; 
-      padding: 10px; 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      padding: 20px; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
     }
-    h1 { 
-      text-align: center; 
-      font-size: 2.0rem; /* ajustado */
+    
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
-    form { 
-      display: flex; 
-      gap: 10px; 
-      justify-content: center; 
-      flex-wrap: wrap; 
-      margin-bottom: 20px; 
+    
+    header {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
     }
-    input[type="text"] { 
-      flex: 1; 
-      min-width: 200px; 
-      padding: 5px; /* conforto extra */
-      font-size: 1.2rem; /* texto digitado maior */
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      font-weight: 300;
     }
-    button { 
-      padding: 10px 15px; /* dobrado */
-      font-size: 1.2rem;  /* maior texto */
-      cursor: pointer; 
+    
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 300;
     }
-    .result { 
-      border-bottom: 1px solid #ccc; 
-      padding: 10px 0; 
+    
+    .search-section {
+      padding: 40px;
+      background: #f8f9fa;
     }
-    .result a { 
-      font-weight: bold; 
-      text-decoration: none; 
-      color: #0066cc; 
+    
+    .search-box {
+      display: flex;
+      gap: 15px;
+      max-width: 800px;
+      margin: 0 auto;
     }
-    .result a:hover {
-      text-decoration: underline;
+    
+    #keyword {
+      flex: 1;
+      padding: 15px 20px;
+      font-size: 1.1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      transition: all 0.3s;
     }
-    .snippet { 
-      color: #555; 
-      font-style: italic; 
-      margin-top: 5px;
+    
+    #keyword:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      outline: none;
+    }
+    
+    #searchBtn {
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    
+    #searchBtn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+    }
+    
+    #searchBtn:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .results-section {
+      padding: 20px 40px 40px 40px;
+    }
+    
+    .results-info {
+      text-align: center;
+      color: #7f8c8d;
+      margin: 20px 0;
+      font-size: 1.1rem;
+    }
+    
+    .filtro-pasta {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    
+    .filtro-btn {
+      background: white;
+      border: 2px solid #3498db;
+      color: #3498db;
+      padding: 8px 16px;
+      margin: 5px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
       font-size: 0.9rem;
+    }
+    
+    .filtro-btn.active, .filtro-btn:hover {
+      background: #3498db;
+      color: white;
+    }
+    
+    .result {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+      border-left: 5px solid #3498db;
+    }
+    
+    .result:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .result-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #2c3e50;
+      text-decoration: none;
+      flex: 1;
+    }
+    
+    .result-title:hover {
+      color: #3498db;
+    }
+    
+    .result-pasta {
+      background: #3498db;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .result-meta {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    
+    .snippet {
+      color: #5a6c7d;
+      line-height: 1.6;
+      margin: 15px 0;
+      font-size: 1rem;
+    }
+    
+    .highlight {
+      background: #fff3cd;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-weight: 600;
+      color: #856404;
+    }
+    
+    .links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .link-btn {
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      border: 2px solid;
+    }
+    
+    .link-preview {
+      background: #3498db;
+      color: white;
+      border-color: #3498db;
+    }
+    
+    .link-edit {
+      background: #27ae60;
+      color: white;
+      border-color: #27ae60;
+    }
+    
+    .link-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #7f8c8d;
+      font-size: 1.1rem;
+    }
+    
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error {
+      background: #e74c3c;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #7f8c8d;
+    }
+    
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      border-top: 1px solid #e9ecef;
+      margin-top: 40px;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .search-box {
+        flex-direction: column;
+      }
+      
+      .search-section, .results-section {
+        padding: 20px;
+      }
+      
+      .result-header {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>🔍 Buscar em Atas</h1>
-  <form onsubmit="buscar(); return false;">
-    <input type="text" id="keyword" placeholder="Digite a palavra-chave..." required>
-    <button type="submit">Buscar</button>
-  </form>
-  <div id="resultados"></div>
+  <div class="container">
+    <header>
+      <h1>🔍 Sistema de Busca de Atas</h1>
+      <p class="subtitle">Encontre informações em todas as atas organizadas por ano</p>
+    </header>
+    
+    <section class="search-section">
+      <div class="search-box">
+        <input type="text" id="keyword" placeholder="Digite a palavra ou frase que deseja buscar..." required autofocus>
+        <button type="submit" id="searchBtn">Buscar</button>
+      </div>
+    </section>
+    
+    <section class="results-section">
+      <div id="filtros"></div>
+      <div id="resultados">
+        <div class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <h3>Busque por palavras ou frases</h3>
+          <p>Digite acima o termo que deseja encontrar em suas atas</p>
+        </div>
+      </div>
+    </section>
+    
+    <footer>
+      <p>Sistema de Busca • Desenvolvido com Google Apps Script • © 2024</p>
+    </footer>
+  </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwWSYdiaETX9nt1B32P1AYnXgd_EBtSQZbpzVcRCy6zQWNyyhZrzZo-sitLUAR6mtMxbg/exec"; // <-- troque pela URL do seu Apps Script
+    // 🔗 URL DO SEU APPS SCRIPT - ATUALIZE ESTA LINHA!
+    const API_URL = "https://script.google.com/macros/s/AKfycbyv062e_AIuvIwNaHDN6Sqvs0uvlK7Z_aga7MbvniwfZQeUE6z0GohyHOZga6CvwX2K-A/exec";
+    
+    let resultadosCompletos = [];
 
     async function buscar() {
-      const palavra = document.getElementById("keyword").value;
-      document.getElementById("resultados").innerHTML = "<p>Buscando...</p>";
+      const palavra = document.getElementById("keyword").value.trim();
+      const searchBtn = document.getElementById('searchBtn');
+      const resultadosDiv = document.getElementById('resultados');
+      const filtrosDiv = document.getElementById('filtros');
+
+      if (!palavra) {
+        resultadosDiv.innerHTML = '<div class="error">Por favor, digite uma palavra para buscar.</div>';
+        return;
+      }
+
+      // Mostrar loading
+      searchBtn.disabled = true;
+      searchBtn.textContent = 'Buscando...';
+      filtrosDiv.innerHTML = '';
+      resultadosDiv.innerHTML = `
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          Buscando em todas as atas...
+        </div>
+      `;
 
       try {
-        const resp = await fetch(API_URL + "?busca=" + encodeURIComponent(palavra));
+        const url = API_URL + "?busca=" + encodeURIComponent(palavra);
+        const resp = await fetch(url);
+        
+        if (!resp.ok) {
+          throw new Error(`Erro HTTP: ${resp.status}`);
+        }
+        
         const data = await resp.json();
 
-        if (data.length === 0) {
-          document.getElementById("resultados").innerHTML = "<p>Nenhum documento encontrado.</p>";
+        if (data.erro) {
+          resultadosDiv.innerHTML = `<div class="error">Erro: ${data.erro}</div>`;
+          return;
+        }
+
+        resultadosCompletos = data.resultados || [];
+        
+        if (data.total === 0) {
+          resultadosDiv.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">😕</div>
+              <h3>Nenhum resultado encontrado</h3>
+              <p>Nenhum documento contém a palavra: "<strong>${palavra}</strong>"</p>
+              <p><small>Tente usar termos diferentes ou verificar a grafia.</small></p>
+            </div>
+          `;
         } else {
-          let html = "<h2>Resultados:</h2>";
-          data.forEach(doc => {
-            html += `<div class="result">
-                      <a href="${doc.link}" target="_blank">${doc.nome}</a>
-                      <div class="snippet">${doc.trecho}</div>
-                     </div>`;
-          });
-          document.getElementById("resultados").innerHTML = html;
+          criarFiltrosPorPasta(resultadosCompletos);
+          mostrarResultados(resultadosCompletos, palavra);
         }
       } catch (e) {
-        document.getElementById("resultados").innerHTML = "<p>Erro ao buscar resultados.</p>";
-        console.error(e);
+        console.error('Erro:', e);
+        resultadosDiv.innerHTML = `
+          <div class="error">
+            <h3>Erro de conexão</h3>
+            <p>Não foi possível conectar ao servidor. Verifique:</p>
+            <ul style="text-align: left; margin: 15px 0;">
+              <li>Sua conexão com a internet</li>
+              <li>Se a URL da API está correta</li>
+              <li>Se o serviço está publicado corretamente</li>
+            </ul>
+            <small>Detalhes: ${e.message}</small>
+          </div>
+        `;
+      } finally {
+        searchBtn.disabled = false;
+        searchBtn.textContent = 'Buscar';
       }
     }
+
+    function criarFiltrosPorPasta(resultados) {
+      const filtrosDiv = document.getElementById('filtros');
+      const pastas = [...new Set(resultados.map(r => r.pasta))].sort();
+      
+      if (pastas.length <= 1) return;
+      
+      let html = `
+        <div class="filtro-pasta">
+          <strong>Filtrar por ano/pasta:</strong><br>
+          <button class="filtro-btn active" onclick="filtrarPorPasta('todas')">
+            📁 Todas as pastas (${resultados.length})
+          </button>
+      `;
+      
+      pastas.forEach(pasta => {
+        const count = resultados.filter(r => r.pasta === pasta).length;
+        html += `
+          <button class="filtro-btn" onclick="filtrarPorPasta('${pasta}')">
+            📂 ${pasta} (${count})
+          </button>
+        `;
+      });
+      
+      html += '</div>';
+      filtrosDiv.innerHTML = html;
+    }
+
+    function filtrarPorPasta(pastaFiltro) {
+      const palavra = document.getElementById("keyword").value.trim();
+      let resultadosFiltrados = resultadosCompletos;
+      
+      if (pastaFiltro !== 'todas') {
+        resultadosFiltrados = resultadosCompletos.filter(r => r.pasta === pastaFiltro);
+      }
+      
+      // Atualizar botões de filtro
+      document.querySelectorAll('.filtro-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      mostrarResultados(resultadosFiltrados, palavra);
+    }
+
+    function mostrarResultados(resultados, palavra) {
+      const resultadosDiv = document.getElementById('resultados');
+      
+      let html = `
+        <div class="results-info">
+          ✅ Encontrados <strong>${resultados.length}</strong> resultados para: "<strong>${palavra}</strong>"
+        </div>
+      `;
+      
+      resultados.forEach(doc => {
+        // Destacar a palavra buscada
+        const snippetComDestaque = doc.trecho.replace(
+          new RegExp(`(${palavra})`, 'gi'), 
+          '<span class="highlight">$1</span>'
+        );
+
+        // Formatar data
+        const dataFormatada = new Date(doc.dataModificacao).toLocaleDateString('pt-BR');
+        
+        html += `
+          <div class="result">
+            <div class="result-header">
+              <a href="${doc.linkPreview}" class="result-title" target="_blank">${doc.nome}</a>
+              <div class="result-pasta" title="${doc.caminho || doc.pasta}">${doc.pasta}</div>
+            </div>
+            <div class="result-meta">
+              📅 Modificado em: ${dataFormatada} • 💾 ${(doc.tamanho / 1024).toFixed(1)} KB
+            </div>
+            <div class="snippet">${snippetComDestaque}</div>
+            <div class="links">
+              <a href="${doc.linkPreview}" class="link-btn link-preview" target="_blank">👁️ Visualizar</a>
+              <a href="${doc.linkEdicao}" class="link-btn link-edit" target="_blank">✏️ Abrir para Editar</a>
+            </div>
+          </div>
+        `;
+      });
+      
+      resultadosDiv.innerHTML = html;
+    }
+
+    // Event listeners
+    document.getElementById('keyword').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        buscar();
+      }
+    });
+
+    document.getElementById('searchBtn').addEventListener('click', buscar);
+
+    // Focar no campo de busca
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('keyword').focus();
+    });
   </script>
 </body>
 </html>
